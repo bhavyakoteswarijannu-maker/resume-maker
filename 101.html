@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Resume Maker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+           background-color: #636B2F;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background:#D4DE95;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        h1 {
+            text-align: center;
+            color: #373E02;
+        }
+        .form-section, .resume-preview {
+            margin: 20px 0;
+        }
+        .form-section label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #3D4127;
+        }
+        .form-section input, .form-section textarea, .form-section select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .photo-upload {
+            display: flex;
+            align-items: center;
+        }
+        .photo-upload img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-left: 20px;
+            object-fit: cover;
+            border: white;
+        }
+        .resume-preview {
+            background: #B8E3E9;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .resume-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0B2E33;
+            color: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+        }
+        .resume-header img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border:white;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background: #4F7C82;
+            color: white;
+        }
+        td {
+            background: #B8E3E9;
+        }
+        .section-title {
+            background: #4F7C82;
+            color: white;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        button {
+            background:  #636B2F;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background: #2b3618;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Online Resume Maker</h1>
+        <div class="form-section">
+            <h2>Enter Your Details</h2>
+            <label>Full Name:</label>
+            <input type="text" id="fullName" placeholder="Enter your full name">
+            <label>Email ID:</label>
+            <input type="email" id="email" placeholder="Enter your email">
+            <label>Phone Number:</label>
+            <input type="tel" id="phone" placeholder="Enter your phone number">
+            <label>Career Objective:</label>
+            <textarea id="careerObjective" placeholder="Enter your career objective"></textarea>
+            <label>Photo:</label>
+            <div class="photo-upload">
+                <input type="file" id="photo" accept="image/*">
+                <img id="photoPreview" src="" alt="Photo Preview" style="display:none;">
+            </div>
+            <label>Education (Course, School/College, University/Board, Period, Percentage/CGPA, Location):</label>
+            <textarea id="education" placeholder="Enter education details (one per line, format: Course,School/College,University/Board,Period,Percentage/CGPA,Location)"></textarea>
+            <label>Experience:</label>
+            <textarea id="experience" placeholder="Enter experience details"></textarea>
+            <label>Skills:</label>
+            <textarea id="skills" placeholder="Enter skills (comma-separated)"></textarea>
+            <label>Personal Information:</label>
+            <textarea id="personalInfo" placeholder="Enter personal information"></textarea>
+            <label>Certificates & Training:</label>
+            <textarea id="certificates" placeholder="Enter certificates and training"></textarea>
+            <label>Awards & Achievements:</label>
+            <textarea id="awards" placeholder="Enter awards and achievements"></textarea>
+            <label>Languages:</label>
+            <textarea id="languages" placeholder="Enter languages (comma-separated)"></textarea>
+            <label>Expected Job Location:</label>
+            <input type="text" id="jobLocation" placeholder="Enter expected job location">
+            <label>Expected Salary:</label>
+            <input type="text" id="salary" placeholder="Enter expected salary">
+            <button onclick="generateResume()">Generate Resume</button>
+            <button onclick="downloadPDF()">Download as PDF</button>
+        </div>
+        <div class="resume-preview" id="resumePreview" style="display:none;">
+            <div class="resume-header">
+                <div>
+                    <h2 id="resumeName"></h2>
+                    <p id="resumeEmail"></p>
+                    <p id="resumePhone"></p>
+                </div>
+                <img id="resumePhoto" src="" alt="Profile Photo">
+            </div>
+            <div class="section-title">Career Objective</div>
+            <p id="resumeObjective"></p>
+            <div class="section-title">Education</div>
+            <table id="educationTable">
+                <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th>School/College</th>
+                        <th>University/Board</th>
+                        <th>Period</th>
+                        <th>Percentage/CGPA</th>
+                        <th>Location</th>
+                    </tr>
+                </thead>
+                <tbody id="educationBody"></tbody>
+            </table>
+            <div class="section-title">Experience</div>
+            <p id="resumeExperience"></p>
+            <div class="section-title">Skills</div>
+            <p id="resumeSkills"></p>
+            <div class="section-title">Personal Information</div>
+            <p id="resumePersonalInfo"></p>
+            <div class="section-title">Certificates & Training</div>
+            <p id="resumeCertificates"></p>
+            <div class="section-title">Awards & Achievements</div>
+            <p id="resumeAwards"></p>
+            <div class="section-title">Languages</div>
+            <p id="resumeLanguages"></p>
+            <div class="section-title">Expected Job Location</div>
+            <p id="resumeJobLocation"></p>
+            <div class="section-title">Expected Salary</div>
+            <p id="resumeSalary"></p>
+        </div>
+    </div>
+
+    <script>
+        function generateResume() {
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const careerObjective = document.getElementById('careerObjective').value;
+            const education = document.getElementById('education').value;
+            const experience = document.getElementById('experience').value;
+            const skills = document.getElementById('skills').value;
+            const personalInfo = document.getElementById('personalInfo').value;
+            const certificates = document.getElementById('certificates').value;
+            const awards = document.getElementById('awards').value;
+            const languages = document.getElementById('languages').value;
+            const jobLocation = document.getElementById('jobLocation').value;
+            const salary = document.getElementById('salary').value;
+
+            document.getElementById('resumeName').textContent = fullName;
+            document.getElementById('resumeEmail').textContent = email;
+            document.getElementById('resumePhone').textContent = phone;
+            document.getElementById('resumeObjective').textContent = careerObjective;
+            document.getElementById('resumeExperience').textContent = experience;
+            document.getElementById('resumeSkills').textContent = skills;
+            document.getElementById('resumePersonalInfo').textContent = personalInfo;
+            document.getElementById('resumeCertificates').textContent = certificates;
+            document.getElementById('resumeAwards').textContent = awards;
+            document.getElementById('resumeLanguages').textContent = languages;
+            document.getElementById('resumeJobLocation').textContent = jobLocation;
+            document.getElementById('resumeSalary').textContent = salary;
+
+            const educationRows = education.split('\n').filter(row => row.trim() !== '');
+            const educationBody = document.getElementById('educationBody');
+            educationBody.innerHTML = '';
+            educationRows.forEach(row => {
+                const [course, school, university, period, percentage, location] = row.split(',');
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${course}</td>
+                    <td>${school}</td>
+                    <td>${university}</td>
+                    <td>${period}</td>
+                    <td>${percentage}</td>
+                    <td>${location}</td>
+                `;
+                educationBody.appendChild(tr);
+            });
+
+            const photo = document.getElementById('photo').files[0];
+            if (photo) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('resumePhoto').src = e.target.result;
+                    document.getElementById('photoPreview').src = e.target.result;
+                    document.getElementById('photoPreview').style.display = 'block';
+                };
+                reader.readAsDataURL(photo);
+            }
+
+            document.getElementById('resumePreview').style.display = 'block';
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById('resumePreview');
+            const opt = {
+                margin: 0.5,
+                filename: 'resume.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().from(element).set(opt).save();
+        }
+
+        document.getElementById('photo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('photoPreview').src = e.target.result;
+                    document.getElementById('photoPreview').style.display = 'block';
+	 document.save('resume.PDF');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>
